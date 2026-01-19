@@ -5,7 +5,9 @@ function App() {
 
   return (
     <>
-      <ChatBotStart/>
+      <div className="container">
+        <ChatBotStart/>
+      </div>
     </>
   )
 }
