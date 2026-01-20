@@ -1,4 +1,5 @@
 import ChatBotStart from "./components/ChatBotStart"
+import ChatBotApp from "./components/ChatBotApp"
 
 function App() {
   
@@ -6,7 +7,8 @@ function App() {
   return (
     <>
       <div className="container">
-        <ChatBotStart/>
+        <ChatBotApp />
+        {/* <ChatBotStart/> */}
       </div>
     </>
   )
