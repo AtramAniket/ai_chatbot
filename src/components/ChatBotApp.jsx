@@ -1,15 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./ChatBotApp.css";
 
-const ChatBotApp = ({ onGoBack, chats, setChats }) => {
+const ChatBotApp = ({ onGoBack, chats, setChats, activeChat, setActiveChat, onNewChat }) => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState(chats[0]?.messages || []);
+
+	useEffect(() => {
+		const activeChatObj = chats.find((chat) => chat.id === activeChat)
+		setMessages(activeChatObj ? activeChatObj.messages : [])
+	},[activeChat, chats])
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
 
   const sendMessage = () => {
+		if (inputValue.trim === "") return 
+
     // create a new chat message object
     const newMessage = {
       type: "prompt",
@@ -23,8 +30,8 @@ const ChatBotApp = ({ onGoBack, chats, setChats }) => {
     setInputValue("");
 
     // the current message should be updated accordingly
-    const updateChats = chats.map((chat, index) => {
-      if (index === 0) {
+    const updateChats = chats.map((chat) => {
+      if (chat?.id === activeChat) {
         return { ...chat, messages: updatedMessages };
       }
       return chat;
@@ -41,17 +48,22 @@ const ChatBotApp = ({ onGoBack, chats, setChats }) => {
 		}
 	}
 
+	const handleSelectChat = (id) => {
+		setActiveChat(id)
+	}
+
   return (
     <div className="chat-app">
       <div className="chat-list">
         <div className="chat-list-header">
           <h2>Chat List</h2>
-          <i className="bx bx-edit-alt new-chat"></i>
+          <i className="bx bx-edit-alt new-chat" onClick={onNewChat}></i>
         </div>
-        {chats?.map((chat, index) => (
+        {chats?.map((chat) => (
           <div
-            key={index}
-            className={`chat-list-item ${index === 0 ? "active" : ""}`}
+            key={chat?.id}
+            className={`chat-list-item ${chat?.id === activeChat ? "active" : ""}`}
+						onClick={()=> handleSelectChat(chat?.id)}
           >
             <h4>{chat?.id}</h4>
             <i className="bx bx-x-circle"></i>
