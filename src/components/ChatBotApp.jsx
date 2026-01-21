@@ -65,7 +65,7 @@ const ChatBotApp = ({ onGoBack, chats, setChats, activeChat, setActiveChat, onNe
             className={`chat-list-item ${chat?.id === activeChat ? "active" : ""}`}
 						onClick={()=> handleSelectChat(chat?.id)}
           >
-            <h4>{chat?.id}</h4>
+            <h4>{chat?.displayId}</h4>
             <i className="bx bx-x-circle"></i>
           </div>
         ))}
