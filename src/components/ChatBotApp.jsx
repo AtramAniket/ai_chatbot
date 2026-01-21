@@ -52,6 +52,17 @@ const ChatBotApp = ({ onGoBack, chats, setChats, activeChat, setActiveChat, onNe
 		setActiveChat(id)
 	}
 
+	const handleDeleteChat = (id) => {
+		const updatedChats = chats.filter((chat) => chat.id !== id)
+
+		setChats(updatedChats)
+
+		if(id === activeChat) {
+			const newActiveChat = updatedChats.length > 0 ? updatedChats[0].id : null
+			setActiveChat(newActiveChat)
+		}
+	}
+
   return (
     <div className="chat-app">
       <div className="chat-list">
@@ -66,7 +77,13 @@ const ChatBotApp = ({ onGoBack, chats, setChats, activeChat, setActiveChat, onNe
 						onClick={()=> handleSelectChat(chat?.id)}
           >
             <h4>{chat?.displayId}</h4>
-            <i className="bx bx-x-circle"></i>
+            <i 
+						className="bx bx-x-circle"
+						onClick={(e)=>{
+							e.stopPropagation()
+							handleDeleteChat(chat?.id)
+						}}
+						></i>
           </div>
         ))}
       </div>
