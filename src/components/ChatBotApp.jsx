@@ -25,7 +25,7 @@ const ChatBotApp = ({ onGoBack, chats, setChats }) => {
     // the current message should be updated accordingly
     const updateChats = chats.map((chat, index) => {
       if (index === 0) {
-        return { ...chats, messages: updatedMessages };
+        return { ...chat, messages: updatedMessages };
       }
       return chat;
     });
