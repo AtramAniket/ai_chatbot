@@ -58,7 +58,7 @@ const ChatBotApp = ({
           headers: {
             "Content-Type": "application/json",
             Authorization:
-              "Bearer",
+              "",
           },
           body: JSON.stringify({
             model: "gpt-5-nano",
