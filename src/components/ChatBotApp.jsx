@@ -21,7 +21,7 @@ const ChatBotApp = ({
     setInputValue(e.target.value);
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (inputValue.trim() === "") return;
 
     // create a new chat message object
@@ -32,8 +32,8 @@ const ChatBotApp = ({
     };
 
     if (!activeChat) {
-      onNewChat(inputValue)
-      setInputValue("")
+      onNewChat(inputValue);
+      setInputValue("");
     } else {
       // update the message state with this new message
       const updatedMessages = [...messages, newMessage];
@@ -50,6 +50,51 @@ const ChatBotApp = ({
 
       // update the chat state
       setChats(updateChats);
+
+      const response = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              "Bearer",
+          },
+          body: JSON.stringify({
+            model: "gpt-5-nano",
+            messages: [
+              {
+                role: "user",
+                content: inputValue,
+              },
+            ],
+            reasoning_effort: "low",
+            verbosity: "low"
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      const chatResponse = data.choices[0].message.content.trim();
+
+      const newResponse = {
+        typ: "response",
+        text: chatResponse,
+        timestamp: new Date().toLocaleTimeString(),
+      };
+
+      const updatedMessagesWithResponse = [...updatedMessages, newResponse];
+
+      setMessages(updatedMessagesWithResponse);
+
+      const updateChatsWithresponse = chats.map((chat) => {
+        if (chat.id === activeChat) {
+          return { ...chat, messages: updatedMessagesWithResponse };
+        } else return chat;
+      });
+
+      setChats(updateChatsWithresponse);
     }
   };
 

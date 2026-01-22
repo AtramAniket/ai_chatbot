@@ -105,6 +105,11 @@
     flex-direction: column;
     padding: 1rem;
     row-gap: 4rem;
+    overflow-y: auto;
+}
+
+.chat::-webkit-scrollbar{
+    display: none;
 }
 
 .prompt, .response {
