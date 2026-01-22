@@ -1,21 +1,28 @@
 import { useEffect, useState } from "react";
 import "./ChatBotApp.css";
 
-const ChatBotApp = ({ onGoBack, chats, setChats, activeChat, setActiveChat, onNewChat }) => {
+const ChatBotApp = ({
+  onGoBack,
+  chats,
+  setChats,
+  activeChat,
+  setActiveChat,
+  onNewChat,
+}) => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState(chats[0]?.messages || []);
 
-	useEffect(() => {
-		const activeChatObj = chats.find((chat) => chat.id === activeChat)
-		setMessages(activeChatObj ? activeChatObj.messages : [])
-	},[activeChat, chats])
+  useEffect(() => {
+    const activeChatObj = chats.find((chat) => chat.id === activeChat);
+    setMessages(activeChatObj ? activeChatObj.messages : []);
+  }, [activeChat, chats]);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
 
   const sendMessage = () => {
-		if (inputValue.trim === "") return 
+    if (inputValue.trim() === "") return;
 
     // create a new chat message object
     const newMessage = {
@@ -24,44 +31,49 @@ const ChatBotApp = ({ onGoBack, chats, setChats, activeChat, setActiveChat, onNe
       timestamp: new Date().toLocaleTimeString(),
     };
 
-    // update the message state with this new message
-    const updatedMessages = [...messages, newMessage];
-    setMessages(updatedMessages);
-    setInputValue("");
+    if (!activeChat) {
+      onNewChat(inputValue)
+      setInputValue("")
+    } else {
+      // update the message state with this new message
+      const updatedMessages = [...messages, newMessage];
+      setMessages(updatedMessages);
+      setInputValue("");
 
-    // the current message should be updated accordingly
-    const updateChats = chats.map((chat) => {
-      if (chat?.id === activeChat) {
-        return { ...chat, messages: updatedMessages };
-      }
-      return chat;
-    });
+      // the current message should be updated accordingly
+      const updateChats = chats.map((chat) => {
+        if (chat?.id === activeChat) {
+          return { ...chat, messages: updatedMessages };
+        }
+        return chat;
+      });
 
-    // update the chat state
-    setChats(updateChats);
+      // update the chat state
+      setChats(updateChats);
+    }
   };
 
-	const handleKeyDown = (e) => {
-		if (e.key === "Enter") {
-			e.preventDefault()
-			sendMessage()
-		}
-	}
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
 
-	const handleSelectChat = (id) => {
-		setActiveChat(id)
-	}
+  const handleSelectChat = (id) => {
+    setActiveChat(id);
+  };
 
-	const handleDeleteChat = (id) => {
-		const updatedChats = chats.filter((chat) => chat.id !== id)
+  const handleDeleteChat = (id) => {
+    const updatedChats = chats.filter((chat) => chat.id !== id);
 
-		setChats(updatedChats)
+    setChats(updatedChats);
 
-		if(id === activeChat) {
-			const newActiveChat = updatedChats.length > 0 ? updatedChats[0].id : null
-			setActiveChat(newActiveChat)
-		}
-	}
+    if (id === activeChat) {
+      const newActiveChat = updatedChats.length > 0 ? updatedChats[0].id : null;
+      setActiveChat(newActiveChat);
+    }
+  };
 
   return (
     <div className="chat-app">
@@ -74,16 +86,16 @@ const ChatBotApp = ({ onGoBack, chats, setChats, activeChat, setActiveChat, onNe
           <div
             key={chat?.id}
             className={`chat-list-item ${chat?.id === activeChat ? "active" : ""}`}
-						onClick={()=> handleSelectChat(chat?.id)}
+            onClick={() => handleSelectChat(chat?.id)}
           >
             <h4>{chat?.displayId}</h4>
-            <i 
-						className="bx bx-x-circle"
-						onClick={(e)=>{
-							e.stopPropagation()
-							handleDeleteChat(chat?.id)
-						}}
-						></i>
+            <i
+              className="bx bx-x-circle"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteChat(chat?.id);
+              }}
+            ></i>
           </div>
         ))}
       </div>
@@ -111,7 +123,7 @@ const ChatBotApp = ({ onGoBack, chats, setChats, activeChat, setActiveChat, onNe
             placeholder="Type a message..."
             value={inputValue}
             onChange={handleInputChange}
-						onKeyDown={handleKeyDown}
+            onKeyDown={handleKeyDown}
           />
           <i className="fa-solid fa-paper-plane" onClick={sendMessage}></i>
         </form>
