@@ -83,7 +83,7 @@ const ChatBotApp = ({
       const chatResponse = data.choices[0].message.content.trim();
 
       const newResponse = {
-        typ: "response",
+        type: "response",
         text: chatResponse,
         timestamp: new Date().toLocaleTimeString(),
       };
