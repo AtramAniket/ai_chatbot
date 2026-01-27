@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./ChatBotApp.css";
 
 const ChatBotApp = ({
@@ -11,6 +11,8 @@ const ChatBotApp = ({
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState(chats[0]?.messages || []);
+  const [isTyping, setIsTyping] = useState(false)
+  const chatEndRef = useRef(null)
 
   useEffect(() => {
     const activeChatObj = chats.find((chat) => chat.id === activeChat);
@@ -50,6 +52,7 @@ const ChatBotApp = ({
 
       // update the chat state
       setChats(updateChats);
+      setIsTyping(true)
 
       const response = await fetch(
         "https://api.openai.com/v1/chat/completions",
@@ -87,6 +90,7 @@ const ChatBotApp = ({
       const updatedMessagesWithResponse = [...updatedMessages, newResponse];
 
       setMessages(updatedMessagesWithResponse);
+      setIsTyping(false)
 
       const updateChatsWithresponse = chats.map((chat) => {
         if (chat.id === activeChat) {
@@ -120,12 +124,16 @@ const ChatBotApp = ({
     }
   };
 
+  useEffect(()=>{
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
   return (
     <div className="chat-app">
       <div className="chat-list">
         <div className="chat-list-header">
           <h2>Chat List</h2>
-          <i className="bx bx-edit-alt new-chat" onClick={onNewChat}></i>
+          <i className="bx bx-edit-alt new-chat" onClick={() => onNewChat()}></i>
         </div>
         {chats?.map((chat) => (
           <div
@@ -158,7 +166,10 @@ const ChatBotApp = ({
               {msg?.text} <span>{msg?.timestamp}</span>
             </div>
           ))}
-          <div className="typing">Typing...</div>
+          {
+            isTyping && <div className="typing">Typing...</div>
+          }
+          <div ref={chatEndRef}></div>
         </div>
         <form className="msg-form" onSubmit={(e) => e.preventDefault()}>
           <i className="fa-solid fa-face-smile emoji"></i>
