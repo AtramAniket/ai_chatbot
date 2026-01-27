@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import "./ChatBotApp.css";
+import Picker from "emoji-picker-react";
 
 const ChatBotApp = ({
   onGoBack,
@@ -11,8 +12,9 @@ const ChatBotApp = ({
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState(chats[0]?.messages || []);
-  const [isTyping, setIsTyping] = useState(false)
-  const chatEndRef = useRef(null)
+  const [isTyping, setIsTyping] = useState(false);
+  const chatEndRef = useRef(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   useEffect(() => {
     const activeChatObj = chats.find((chat) => chat.id === activeChat);
@@ -52,7 +54,7 @@ const ChatBotApp = ({
 
       // update the chat state
       setChats(updateChats);
-      setIsTyping(true)
+      setIsTyping(true);
 
       const response = await fetch(
         "https://api.openai.com/v1/chat/completions",
@@ -60,8 +62,7 @@ const ChatBotApp = ({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization:
-              "",
+            Authorization: "",
           },
           body: JSON.stringify({
             model: "gpt-5-nano",
@@ -72,7 +73,7 @@ const ChatBotApp = ({
               },
             ],
             reasoning_effort: "low",
-            verbosity: "low"
+            verbosity: "low",
           }),
         },
       );
@@ -90,7 +91,7 @@ const ChatBotApp = ({
       const updatedMessagesWithResponse = [...updatedMessages, newResponse];
 
       setMessages(updatedMessagesWithResponse);
-      setIsTyping(false)
+      setIsTyping(false);
 
       const updateChatsWithresponse = chats.map((chat) => {
         if (chat.id === activeChat) {
@@ -124,16 +125,23 @@ const ChatBotApp = ({
     }
   };
 
-  useEffect(()=>{
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  const onEmojiClick = (emojiObject) => {
+    setInputValue((prev) => prev + emojiObject.emoji);
+  };
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <div className="chat-app">
       <div className="chat-list">
         <div className="chat-list-header">
           <h2>Chat List</h2>
-          <i className="bx bx-edit-alt new-chat" onClick={() => onNewChat()}></i>
+          <i
+            className="bx bx-edit-alt new-chat"
+            onClick={() => onNewChat()}
+          ></i>
         </div>
         {chats?.map((chat) => (
           <div
@@ -166,13 +174,22 @@ const ChatBotApp = ({
               {msg?.text} <span>{msg?.timestamp}</span>
             </div>
           ))}
-          {
-            isTyping && <div className="typing">Typing...</div>
-          }
+          {isTyping && <div className="typing">Typing...</div>}
           <div ref={chatEndRef}></div>
         </div>
         <form className="msg-form" onSubmit={(e) => e.preventDefault()}>
-          <i className="fa-solid fa-face-smile emoji"></i>
+          <i
+            className="fa-solid fa-face-smile emoji"
+            onClick={() => setShowEmojiPicker((prev) => !prev)}
+          ></i>
+          {showEmojiPicker && (
+            <div className="emoji-picker-container">
+              <Picker
+                onEmojiClick={onEmojiClick}
+                theme="dark"
+              />
+            </div>
+          )}
           <input
             type="text"
             className="msg-input"
@@ -180,6 +197,7 @@ const ChatBotApp = ({
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
+            onFocus={()=> setShowEmojiPicker(false)}
           />
           <i className="fa-solid fa-paper-plane" onClick={sendMessage}></i>
         </form>
